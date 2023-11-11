@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 wagons = []
 station_names = []
+stations = []
 
 
 def load_wagons_data():
@@ -25,11 +26,11 @@ def load_wagons_data():
                 train_info = train_info_value.split("-")
             wagon = {
                 "wagonId": sheet.cell(row=i, column=1).value,
-                "currentStationId": sheet.cell(row=i, column=3).value,
+                "stationId": sheet.cell(row=i, column=3).value,
                 "arrivalTime": sheet.cell(row=i, column=2).value,
-                "wagonStartStation": train_info[0],
                 "wagonDestination": sheet.cell(row=i, column=4).value,
-                "trainDestination": train_info[2],
+                "trainDeparturePoint": train_info[0],
+                "trainDestinationPoint": train_info[2],
                 "trainNumber": train_info[1]
             }
             wagons.append(wagon)
@@ -41,8 +42,7 @@ def get_wagons_data(page, size):
     return wagons[start:end]
 
 
-def get_stations_data():
-    stations = []
+def load_stations_data():
     stations_data_path = "data/STATION_COORDS_HACKATON.xlsx"
     wb = openpyxl.load_workbook(stations_data_path)
     sheet = wb.active
@@ -54,7 +54,6 @@ def get_stations_data():
             "longitude": sheet.cell(row=i, column=3).value
         }
         stations.append(station)
-    return stations
 
 
 def load_station_names():
@@ -64,15 +63,13 @@ def load_station_names():
 
 
 load_station_names()
+load_stations_data()
 thr = threading.Thread(target=load_wagons_data, args=(), kwargs={})
 thr.start()
-# get_wagons_data()
 
 
 @app.route("/stations")
 def get_stations():
-    stations = get_stations_data()
-
     return jsonify(stations), 200
 
 
@@ -92,6 +89,36 @@ def get_wagons():
     wagons_data = wagons[page:size]
 
     return jsonify(wagons_data), 200
+
+
+@app.route("/trains/<train_number>")
+def get_wagon(train_number):
+    pgk_wagons_in_train = []
+    train_info = {}
+    train_info_raw = {}
+    for wagon in wagons:
+        if wagon["trainNumber"] == train_number:
+            pgk_wagons_in_train.append(wagon["wagonId"])
+            train_info_raw["trainDeparturePoint"] = int(wagon["trainDeparturePoint"])
+            train_info_raw["trainDestinationPoint"] = int(wagon["trainDestinationPoint"])
+
+    for wagon in wagons:
+        if wagon["stationId"] == train_info_raw["trainDeparturePoint"]:
+            train_info_raw["departureAt"] = wagon["arrivalTime"]
+        if wagon["stationId"] == train_info_raw["trainDestinationPoint"]:
+            train_info_raw["arriveAt"] = wagon["arrivalTime"]
+
+    for station in stations:
+        if station["id"] == train_info_raw["trainDeparturePoint"]:
+            train_info["from"] = station["name"]
+        if station["id"] == train_info_raw["trainDestinationPoint"]:
+            train_info["to"] = station["name"]
+
+    train_info["arriveAt"] = train_info_raw["arriveAt"] if train_info_raw["arriveAt"] else ""
+    train_info["departureAt"] = train_info_raw["departureAt"] if train_info_raw["departureAt"] else ""
+    train_info["wagons"] = pgk_wagons_in_train
+
+    return jsonify(train_info), 200
 
 
 if __name__ == "__main__":
