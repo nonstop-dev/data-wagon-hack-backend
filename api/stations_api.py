@@ -28,6 +28,18 @@ def load_stations_data():
         stations.append(station)
 
 
+def get_stations_by_id(station_id):
+    for s in stations:
+        if s["id"] == int(station_id):
+            return s
+
+
+def get_stations_data(page, size):
+    start = page*size
+    end = (page+1)*size
+    return stations[start:end]
+
+
 load_station_names()
 load_stations_data()
 
@@ -44,13 +56,13 @@ def get_stations():
         size = int(size)
     else:
         size = 100
-    stations_data = stations[page:size]
+    stations_data = get_stations_data(page, size)
     return jsonify(stations_data), 200
 
 
 @stations_api.route("/api/stations/<station_id>")
 def get_station(station_id):
-    for s in stations:
-        if s["id"] == int(station_id):
-            return jsonify(s), 200
+    station = get_stations_by_id(station_id)
+    if station:
+        return jsonify(station), 200
     return jsonify({"message": "NotFound"}), 404

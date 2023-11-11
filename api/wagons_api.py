@@ -1,6 +1,7 @@
 import openpyxl
 import threading
 from flask import Blueprint, request, jsonify
+from api.stations_api import get_stations_by_id
 
 wagons_api = Blueprint("wagons_api", __name__)
 wagons = []
@@ -18,14 +19,18 @@ def load_wagons_data():
             train_info = ""
             if train_info_value != "":
                 train_info = train_info_value.split("-")
+            station_id = sheet.cell(row=i, column=3).value
+            station = get_stations_by_id(station_id)
             wagon = {
                 "wagonId": sheet.cell(row=i, column=1).value,
-                "stationId": sheet.cell(row=i, column=3).value,
+                "stationId": station_id,
                 "arrivalTime": sheet.cell(row=i, column=2).value,
                 "wagonDestination": sheet.cell(row=i, column=4).value,
                 "trainDeparturePoint": train_info[0],
                 "trainDestinationPoint": train_info[2],
-                "trainNumber": train_info[1]
+                "trainNumber": train_info[1],
+                "latitude": "" if station is None else station["latitude"],
+                "longitude": "" if station is None else station["longitude"]
             }
             wagons.append(wagon)
 
@@ -53,6 +58,6 @@ def get_wagons():
     else:
         size = 100
 
-    wagons_data = wagons[page:size]
+    wagons_data = get_wagons_data(page, size)
 
     return jsonify(wagons_data), 200
