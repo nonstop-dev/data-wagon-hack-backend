@@ -1,10 +1,13 @@
 import openpyxl
+import random
+import io
 
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 wagons = []
+station_names = []
 
 
 def get_wagons_data():
@@ -43,7 +46,8 @@ def get_stations_data():
     sheet = wb.active
     for i in range(2, sheet.max_row):
         station = {
-            "stationId": sheet.cell(row=i, column=1).value,
+            "id": sheet.cell(row=i, column=1).value,
+            "name": random.choice(station_names),
             "latitude": sheet.cell(row=i, column=2).value,
             "longitude": sheet.cell(row=i, column=3).value
         }
@@ -51,6 +55,13 @@ def get_stations_data():
     return stations
 
 
+def load_station_names():
+    with io.open("data/Stations.txt", encoding='utf-8') as file:
+        for line in file:
+            station_names.append(line.rstrip())
+
+
+load_station_names()
 # get_wagons_data()
 
 
