@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 import openpyxl
 import random
 import io
@@ -34,7 +34,18 @@ load_stations_data()
 
 @stations_api.route("/api/stations")
 def get_stations():
-    return jsonify(stations), 200
+    page = request.args.get("page")
+    size = request.args.get("size")
+    if page:
+        page = int(page)
+    else:
+        page = 0
+    if size:
+        size = int(size)
+    else:
+        size = 100
+    stations_data = stations[page:size]
+    return jsonify(stations_data), 200
 
 
 @stations_api.route("/api/stations/<station_id>")
