@@ -32,12 +32,12 @@ load_station_names()
 load_stations_data()
 
 
-@stations_api.route("/stations")
+@stations_api.route("/api/stations")
 def get_stations():
     return jsonify(stations), 200
 
 
-@stations_api.route("/stations/<station_id>")
+@stations_api.route("/api/stations/<station_id>")
 def get_station(station_id):
     # station = next((s for s in stations if s["id"] == int(station_id)), None)
     for s in stations:

@@ -40,7 +40,7 @@ thr = threading.Thread(target=load_wagons_data, args=(), kwargs={})
 thr.start()
 
 
-@wagons_api.route("/wagons")
+@wagons_api.route("/api/wagons")
 def get_wagons():
     page = request.args.get("page")
     size = request.args.get("size")

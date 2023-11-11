@@ -8,7 +8,7 @@ app.register_blueprint(stations_api)
 app.register_blueprint(wagons_api)
 
 
-@app.route("/trains/<train_number>")
+@app.route("/api/trains/<train_number>")
 def get_wagon(train_number):
     pgk_wagons_in_train = []
     train_info = {}
