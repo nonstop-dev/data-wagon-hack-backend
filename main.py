@@ -1,6 +1,7 @@
 import openpyxl
 import random
 import io
+import threading
 
 from flask import Flask, request, jsonify
 
@@ -10,10 +11,7 @@ wagons = []
 station_names = []
 
 
-def get_wagons_data():
-    if wagons:
-        return wagons
-
+def load_wagons_data():
     wagons_data_path = "data/disl_hackaton.xlsx"
     wb = openpyxl.load_workbook(filename=wagons_data_path, read_only=True, keep_vba=False)
     sheets = wb.sheetnames
@@ -36,7 +34,11 @@ def get_wagons_data():
             }
             wagons.append(wagon)
 
-    return wagons
+
+def get_wagons_data(page, size):
+    start = page*size
+    end = (page+1)*size
+    return wagons[start:end]
 
 
 def get_stations_data():
@@ -62,6 +64,8 @@ def load_station_names():
 
 
 load_station_names()
+thr = threading.Thread(target=load_wagons_data, args=(), kwargs={})
+thr.start()
 # get_wagons_data()
 
 
@@ -74,7 +78,18 @@ def get_stations():
 
 @app.route("/wagons")
 def get_wagons():
-    wagons_data = get_wagons_data()
+    page = request.args.get("page")
+    size = request.args.get("size")
+    if page:
+        page = int(page)
+    else:
+        page = 0
+    if size:
+        size = int(size)
+    else:
+        size = 100
+
+    wagons_data = wagons[page:size]
 
     return jsonify(wagons_data), 200
 
