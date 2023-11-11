@@ -1,11 +1,22 @@
 from flask import Flask, jsonify
 from api.stations_api import stations_api, stations
 from api.wagons_api import wagons_api, wagons
+from flask_swagger_ui import get_swaggerui_blueprint
 
+SWAGGER_URL = '/api/docs'
+API_URL = '/static/swagger.json'
 
 app = Flask(__name__)
 app.register_blueprint(stations_api)
 app.register_blueprint(wagons_api)
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        "app_name": "NonStop Data Wagon"
+    }
+)
+app.register_blueprint(swaggerui_blueprint)
 
 
 @app.route("/api/trains/<train_number>")
@@ -45,5 +56,4 @@ def get_wagon(train_number):
     return jsonify(train_info), 200
 
 
-if __name__ == "__main__":
-    app.run()
+app.run()

@@ -39,7 +39,6 @@ def get_stations():
 
 @stations_api.route("/api/stations/<station_id>")
 def get_station(station_id):
-    # station = next((s for s in stations if s["id"] == int(station_id)), None)
     for s in stations:
         if s["id"] == int(station_id):
             return jsonify(s), 200

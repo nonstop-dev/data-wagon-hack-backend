@@ -1,0 +1,131 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "NonStop Data Wagon API",
+    "version": "1.0.6",
+    "title": "NonStop Data Wagon"
+  },
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "trains",
+      "description": "Everything about trains"
+    },
+    {
+      "name": "wagons",
+      "description": "Everything about wagons"
+    },
+    {
+      "name": "stations",
+      "description": "Everything about stations"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/stations": {
+      "get": {
+        "tags": [
+          "stations"
+        ],
+        "summary": "Get all stations",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/stations/id": {
+      "get": {
+        "tags": [
+          "stations"
+        ],
+        "summary": "Get station",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Station id",
+            "required": true,
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/trains/id": {
+      "get": {
+        "tags": [
+          "trains"
+        ],
+        "summary": "Get train",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Train id",
+            "required": true,
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/wagons": {
+      "get": {
+        "tags": [
+          "wagons"
+        ],
+        "summary": "Get all wagons with pagination",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "type": "number"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Size",
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  }
+}
