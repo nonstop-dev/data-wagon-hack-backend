@@ -35,3 +35,12 @@ load_stations_data()
 @stations_api.route("/stations")
 def get_stations():
     return jsonify(stations), 200
+
+
+@stations_api.route("/stations/<station_id>")
+def get_station(station_id):
+    # station = next((s for s in stations if s["id"] == int(station_id)), None)
+    for s in stations:
+        if s["id"] == int(station_id):
+            return jsonify(s), 200
+    return jsonify({"message": "NotFound"}), 404
