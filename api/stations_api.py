@@ -54,3 +54,16 @@ def get_station(station_id):
         if s["id"] == int(station_id):
             return jsonify(s), 200
     return jsonify({"message": "NotFound"}), 404
+
+
+@stations_api.route("/api/stations/search")
+def search_station():
+    latitude = float(request.args.get("latitude"))
+    longitude = float(request.args.get("longitude"))
+    radius = float(request.args.get("radius"))
+    stations_in_radius = []
+    for station in stations:
+        #  (x — x_0)^2 + (y — y_0)^2 <= R^2
+        if station["longitude"] is not None and station["latitude"] is not None and pow((station["latitude"] - latitude), 2) + pow((station["longitude"] - longitude), 2) <= pow(radius, 2):
+            stations_in_radius.append(station)
+    return jsonify(stations_in_radius), 200
